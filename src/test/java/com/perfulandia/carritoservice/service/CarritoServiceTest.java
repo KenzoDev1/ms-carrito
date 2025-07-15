@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,12 @@ public class CarritoServiceTest {
     private Carrito carrito;
     private Usuario usuario;
     private Producto producto;
+
+    @Value("${MS_PRODUCTOS_URL}")
+    private String productoServiceUrl;
+
+    @Value("${MS_USUARIOS_URL}")
+    private String usuarioServiceUrl;
 
     @BeforeEach
     void setUp() {
@@ -77,7 +84,7 @@ public class CarritoServiceTest {
     @Test
     @DisplayName("Test 3 - Debería lanzar excepción al crear carrito si el usuario NO existe")
     void crearNuevoCarritoCuandoUsuarioNoExisteLanzaExcepcion() {
-        String url = "http://localhost:8081/api/usuarios/" + usuario.getId();
+        String url = usuarioServiceUrl + "/api/usuarios/" + usuario.getId();
         when(restTemplate.getForObject(url, Usuario.class))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
@@ -107,7 +114,7 @@ public class CarritoServiceTest {
     @Test
     @DisplayName("Test 5 - Debería lanzar excepción al agregar un producto que NO existe")
     void agregarProductoAlCarritoCuandoProductoNoExisteLanzaExcepcion() {
-        String url = "http://localhost:8082/api/productos/" + producto.getId();
+        String url = productoServiceUrl + "/api/productos/" + producto.getId();
         when(carritoRepository.findById(carrito.getId())).thenReturn(Optional.of(carrito));
         when(restTemplate.getForObject(url, Producto.class))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));

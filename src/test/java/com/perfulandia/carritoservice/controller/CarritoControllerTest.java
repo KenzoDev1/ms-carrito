@@ -62,7 +62,7 @@ public class CarritoControllerTest {
 
         mockMvc.perform(post("/api/carritos/{carritoId}/items", 1L)
                         .param("productoId", "1")
-                        .param("cantidad", "0")) // Cantidad inválida
+                        .param("cantidad", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("La cantidad debe ser un número positivo."));
     }
