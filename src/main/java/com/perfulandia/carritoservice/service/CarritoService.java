@@ -5,6 +5,7 @@ import com.perfulandia.carritoservice.model.*;
 import com.perfulandia.carritoservice.repository.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,12 @@ public class CarritoService {
     private final CarritoRepository carritoRepository;
     private final CarritoItemRepository carritoItemRepository;
     private final RestTemplate restTemplate;
+
+    @Value("${MS_PRODUCTOS_URL}")
+    private String productoServiceUrl;
+
+    @Value("${MS_USUARIOS_URL}")
+    private String usuarioServiceUrl;
 
     @Autowired
     public CarritoService(CarritoRepository carritoRepository, CarritoItemRepository carritoItemRepository, RestTemplate restTemplate) {
@@ -47,7 +54,7 @@ public class CarritoService {
 
     private Usuario obtenerDetallesUsuarioDesdeMS(Long usuarioId) {
         try {
-            return restTemplate.getForObject("http://localhost:8081/api/usuarios/" + usuarioId, Usuario.class);
+            return restTemplate.getForObject(usuarioServiceUrl + "/api/usuarios/" + usuarioId, Usuario.class);
         } catch (HttpClientErrorException e) {
             if(e.getStatusCode() == HttpStatus.NOT_FOUND){
                 throw new ResourceNotFoundException("No se puede operar con el usuario ID " + usuarioId + " porque no existe en el microservicio de usuarios.");
@@ -61,7 +68,7 @@ public class CarritoService {
 
     private Producto obtenerDetallesProductoDesdeMS(Long productoId) {
         try {
-            return restTemplate.getForObject("http://localhost:8082/api/productos/" + productoId, Producto.class);
+            return restTemplate.getForObject(productoServiceUrl + "/api/productos/" + productoId, Producto.class);
         } catch (HttpClientErrorException e) {
             if(e.getStatusCode() == HttpStatus.NOT_FOUND){
                 throw new ResourceNotFoundException("Producto no encontrado con ID: " + productoId);
